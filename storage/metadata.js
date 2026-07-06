@@ -2,7 +2,6 @@
  * Metadata Storage Module
  * Manages upload metadata (file information, offsets, etc.)
  * This implementation uses in-memory storage, but can be extended to use databases
- * Author: Liyu Wu
  * Update: 2026-05-06
  */
 

@@ -1,7 +1,6 @@
 /**
  * Upload Controller Module
  * Handles HTTP request parsing, validation, and response construction
- * Author: Liyu Wu
  * Update: 2026-05-05
  */
 

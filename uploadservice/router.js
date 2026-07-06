@@ -3,7 +3,6 @@
  * Defines routes for the file upload service
  * Routes are mapped to controller methods
  * 
- * Author: Liyu Wu
  * Update: 2026-05-01
  */
 

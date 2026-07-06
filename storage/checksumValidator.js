@@ -1,7 +1,6 @@
 /**
  * Checksum Validation Module
  * Validates checksums of uploaded chunks using various algorithms
- * Author: Liyu Wu
  * Update: 2026-05-07
  */
 

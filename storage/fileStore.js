@@ -2,7 +2,6 @@
  * File Storage Module, using filesystem for storage
  * Handles file I/O operations using Node.js raw streams
  * Supports reading and writing file chunks at specific offsets
- * Author: Liyu Wu
  * Update: 2026-05-07
  */
 

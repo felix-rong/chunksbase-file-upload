@@ -3,7 +3,6 @@
  * Contains business logic for file uploads
  * Manages file handling, validation, and storage operations
  * 
- * Author: Liyu Wu
  * Update: 2026-05-07
  */
 

@@ -196,8 +196,4 @@ curl -X DELETE http://localhost:3000/uploadfiles/{fileId}
 - Explore `/api-docs` for interactive API documentation
 - Review postman collection for API usage examples
 
-## 👤 Author
-
-Liyu Wu
-
 ---

@@ -1,7 +1,6 @@
 /**
  * Configuration Module
  * Sets up server configuration values from environment variables or defaults
- * Author: Liyu Wu
  * Update: 2024-05-07
  */
 

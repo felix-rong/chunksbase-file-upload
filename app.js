@@ -2,7 +2,6 @@
  * Upload Service Entry Point
  * Initializes Express app and sets up middleware, OPEN API document and routes
  * 
- * Author: Liyu Wu
  * Update: 2026-05-05
  */
 
