@@ -1,0 +1,227 @@
+openapi: '3.0.0'
+info:
+  title: 'File Upload Service API'
+  version: '1.0.0'
+  description: 'RESTful API for multipart file upload with resume capability'
+  contact: 
+    name: 'Liyu Wu'
+    email: 'liyu.wu@edu.fh-joanneum.at'
+
+servers:         
+  - url: http://localhost:3000
+    description: Development server
+  - url: http://example.com:8080
+    description: Production server
+
+tags: 
+  - name: Upload
+    description: File upload operations
+
+paths:  # All endpoints and operations
+  /uploadfiles:
+    post:
+      summary: Create a new upload resource
+      description: Creates a new upload resource with the specified file size and optional metadata
+      tags:
+        - Upload
+      parameters:
+        - $ref: '#/components/parameters/UploadLength'
+        - $ref: '#/components/parameters/UploadMetadata'
+      responses:
+        '201':
+          $ref: '#/components/responses/UploadCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  
+  /uploadfiles/{fileId}:
+    patch:
+      summary: Upload a chunk of the file
+      description: |
+        Uploads a chunk of file data at the specified offset.
+        The server will validate the offset and optional checksum.
+      tags:
+        - Upload
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ContentLength'
+        - $ref: '#/components/parameters/UploadOffset'
+        - $ref: '#/components/parameters/Checksum'
+        - $ref: '#/components/parameters/ChecksumAlgorithm'
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+              description: The file chunk data
+      responses:
+        '204':
+          $ref: '#/components/responses/ChunkUploaded'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '460':
+          $ref: '#/components/responses/InvalidChecksum'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    head:
+      summary: Check upload status
+      description: |
+        Retrieves the current status of an upload.
+        Returns the current offset and total size.
+      tags:
+        - Upload
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+      responses:
+        '200':
+          $ref: '#/components/responses/UploadStatus'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Terminate an upload
+      description: |
+        Terminates an upload and frees associated resources.
+        The uploaded file will be deleted.
+      tags:
+        - Upload
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+      responses:
+        '204':
+          description: Upload terminated successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    FileId:
+      in: path
+      name: fileId
+      required: true
+      schema:
+        type: string
+      description: The unique identifier of the upload resource
+    UploadLength:
+      in: header
+      name: Upload-Length
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: Total size of the file in bytes
+    UploadMetadata:
+      in: header
+      name: Upload-Metadata
+      required: true
+      schema:
+        type: string
+      description: |
+        Metadata about the file in format:
+        "key1 value1, key2 value2", must has key "filename"
+        Example: "filename myfile.txt, filetype text/plain"
+    ContentType:
+      in: header
+      name: Content-Type
+      required: true
+      schema:
+        type: string
+        enum:
+          - application/offset+octet-stream
+      description: Must be application/offset+octet-stream
+    ContentLength:
+      in: header
+      name: Content-Length
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: Size of the chunk being uploaded
+    UploadOffset:
+      in: header
+      name: Upload-Offset
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+      description: The offset where the chunk should be written
+    Checksum:
+      in: header
+      name: Checksum
+      required: false
+      schema:
+        type: string
+        example: "sha1 2ef7bde608ce5404e97d5f042f95f89f1c232871"
+      description: |
+        Optional checksum in format: "<algorithm> <value>"
+        Example: "sha1 2ef7bde608ce5404e97d5f042f95f89f1c232871"
+    ChecksumAlgorithm:
+      in: header
+      name: Checksum-Algorithm
+      required: false
+      schema:
+        type: string
+        enum:
+          - sha1
+          - md5
+          - sha256
+          - sha512
+      description: Algorithm used for checksum (required if Checksum header is present)
+
+  responses:
+    UploadCreated:
+      description: Upload resource created successfully
+      headers:
+        Location:
+          description: URL of the newly created upload resource
+          schema:
+            type: string
+            example: /uploadfiles/03052026_1234567890
+        Upload-Metadata:
+          description: Echoes back the metadata sent in the request
+          schema:
+            type: string
+      content: {}
+    ChunkUploaded:
+      description: Chunk uploaded successfully
+      headers:
+        Upload-Offset:
+          description: The new offset for the next chunk
+          schema:
+            type: integer
+      content: {}
+    UploadStatus:
+      description: Upload status retrieved successfully
+      headers:
+        Upload-Offset:
+          description: The current offset of the upload
+          schema:
+            type: integer
+        Upload-Length:
+          description: The total size of the upload
+          schema:
+            type: integer
+        Cache-Control:
+          description: Cache control directive
+          schema:
+            type: string
+            enum:
+              - no-store
+      content: {}
+    NotFound:
+      description: Upload resource not found
+      content: {}
+    Conflict:
+      description: Conflict - invalid Upload-Offset
+      content: {}
+    InvalidChecksum:
+      description: Invalid checksum
+      content: {}
+    BadRequest:
+      description: Bad request - invalid headers or unsupported checksum algorithm
+      content: {}
+
+  schemas: {}

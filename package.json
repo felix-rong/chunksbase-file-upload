@@ -1,0 +1,29 @@
+{
+  "name": "mutilpart-file-upload",
+  "version": "1.0.0",
+  "description": "Multipart file upload service with OpenAPI documentation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "file-upload",
+    "multipart",
+    "tus"
+  ],
+  "author": "Liyu Wu",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.18.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^9.0.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3"
+  }
+}

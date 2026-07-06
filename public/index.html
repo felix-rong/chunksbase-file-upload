@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multipart File Upload Client</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Multipart File Upload Service</h1>
+      <p>Base on OPEN API 
+        <a href="http://localhost:3000/api-docs" target="_blank">http://http://localhost:3000/api-docs</a> 
+        upload service, supports creating upload resources, chunked upload, breakpoint resume, and upload interruption.</p>
+    </header>
+
+    <section class="card">
+      <h2>Select File to Upload</h2>
+      <div class="field-group">
+        <label for="filePath">File Path / Name</label>
+        <input id="filePath" type="text" placeholder="Please select a file from your device or enter the filename manually" />
+      </div>
+      <div class="field-group">
+        <label>File Selection</label>
+        <div id="dropZone" class="drop-zone">
+          <span>Drag files here or click "Select File"</span>
+        </div>
+        <input id="fileInput" type="file" hidden />
+        <button id="browseButton" class="btn">Select File</button>
+      </div>
+
+      <div class="field-group">
+        <label for="fileIdInput">Upload ID (for resuming interrupted uploads)</label>
+        <input id="fileIdInput" type="text" placeholder="If you have an existing fileId, you can paste it here to resume the upload" />
+      </div>
+
+      <div class="actions">
+        <button id="createButton" class="btn primary">Upload</button>
+        <button id="resumeButton" class="btn">Query and Resume Upload</button>
+        <button id="abortButton" class="btn danger">Abort Upload</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Upload Information</h2>
+      <div class="info-row"><span>Current File:</span><strong id="selectedFileName">No file selected</strong></div>
+      <div class="info-row"><span>File Size:</span><strong id="selectedFileSize">0</strong></div>
+      <div class="info-row"><span>Upload ID:</span><strong id="currentUploadId">None</strong></div>
+      <div class="info-row"><span>Uploaded Offset:</span><strong id="currentOffset">0</strong></div>
+      <div class="info-row"><span>Upload Status:</span><strong id="statusText">Waiting for upload</strong></div>
+      <div class="progress-bar"><div id="progressBar"></div></div>
+      <div id="messageBox" class="message"></div>
+    </section>
+  </div>
+
+  <script src="client.js"></script>
+</body>
+</html>

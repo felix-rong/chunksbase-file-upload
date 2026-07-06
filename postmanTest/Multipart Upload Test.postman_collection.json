@@ -1,0 +1,493 @@
+{
+  "info": {
+    "_postman_id": "da5b4513-15f6-4af8-a44f-3eb856b4d2ec",
+    "name": "Multipart Upload Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54175756",
+    "_collection_link": "https://go.postman.co/collection/54175756-da5b4513-15f6-4af8-a44f-3eb856b4d2ec?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "POST /uploadfiles",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Successful POST request, create a new file id\", () => {\r",
+              "    pm.response.to.have.status(201);\r",
+              "    const location = pm.response.headers.get(\"Location\");\r",
+              "    const fileId = location.split(\"/\").pop();\r",
+              "    console.log(fileId);\r",
+              "    pm.collectionVariables.set(\"fileId\", fileId);\r",
+              "    pm.collectionVariables.set(\"offset\", 0)\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Upload-Metadata",
+            "value": "filename testfile.text, filetype text/plain",
+            "type": "text"
+          },
+          {
+            "key": "Upload-Length",
+            "value": "60",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH1 /uploadfiles/{fileId}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Successful PATCH request, upload offset should be updated\", () => {\r",
+              "    pm.response.to.have.status(204);\r",
+              "    const newOffset = Number(pm.response.headers.get(\"Upload-Offset\"));\r",
+              "    pm.expect(newOffset).to.greaterThan(0); // Assuming offset should be greater than 0 after a successful upload\r",
+              "    pm.collectionVariables.set(\"offset\", newOffset); // Store the new offset in a collection variable for future use\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/offset+octet-stream",
+            "type": "text"
+          },
+          {
+            "key": "Upload-Offset",
+            "value": "{{offset}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "Test upload chunk1.\r\n"
+        },
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles/{{fileId}}",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles",
+            "{{fileId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH2 invalid file ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Invalid PATCH request\", () => {\r",
+              "    pm.response.to.have.status(404);    \r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/offset+octet-stream",
+            "type": "text"
+          },
+          {
+            "key": "Upload-Offset",
+            "value": "{{offset}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "Test upload chunk2.\r\n"
+        },
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles/invalidfileId",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles",
+            "invalidfileId"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH2 invalid checksum",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Invalid checksum PATCH request\", () => {\r",
+              "    pm.response.to.have.status(460);    \r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "packages": {},
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/offset+octet-stream",
+            "type": "text"
+          },
+          {
+            "key": "Upload-Offset",
+            "value": "{{offset}}",
+            "type": "text"
+          },
+          {
+            "key": "Checksum",
+            "value": "sha1 invalidchecksum",
+            "type": "text"
+          },
+          {
+            "key": "Checksum-Algorithm",
+            "value": "sha1",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "Test upload chunk2.\r\n"
+        },
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles/{{fileId}}",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles",
+            "{{fileId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH2 with checksum",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const cryptoJS = require('crypto-js');\r",
+              "const bodyContent = pm.request.body.raw;\r",
+              "\r",
+              "if (bodyContent) {\r",
+              "    // 1. caculate sha1\r",
+              "    const hash = cryptoJS.SHA1(bodyContent).toString(); \r",
+              "    // 2. set Upload-Checksum Header\r",
+              "    pm.request.headers.add({\r",
+              "        key: 'Checksum',\r",
+              "        value: `sha1 ${hash}`\r",
+              "    });\r",
+              "    pm.request.headers.add({\r",
+              "        key: 'Checksum-Algorithm',\r",
+              "        value: 'sha1'\r",
+              "    });\r",
+              "    console.log(\"Checksum: \" + hash);\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Successful PATCH request, upload offset should be updated\", () => {\r",
+              "    pm.response.to.have.status(204);\r",
+              "    const newOffset = Number(pm.response.headers.get(\"Upload-Offset\"));\r",
+              "    pm.expect(newOffset).to.be.greaterThan(0); // Assuming offset should be greater than 0 after a successful upload\r",
+              "    pm.collectionVariables.set(\"offset\", newOffset); // Store the new offset in a collection variable for future use\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/offset+octet-stream",
+            "type": "text"
+          },
+          {
+            "key": "Upload-Offset",
+            "value": "{{offset}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "Test upload chunk2.\r\n"
+        },
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles/{{fileId}}",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles",
+            "{{fileId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "HEAD /uploadfiles/{fileId}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Successful HEAD request, check the upload status\", () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    const uploadOffset = Number(pm.response.headers.get(\"Upload-Offset\"));\r",
+              "    pm.expect(uploadOffset).to.not.be.null;\r",
+              "    const uploadLength = pm.response.headers.get(\"Upload-Length\");\r",
+              "    pm.expect(uploadLength).to.not.be.null;\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "HEAD",
+        "header": [],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles/{{fileId}}",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles",
+            "{{fileId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /uploadfiles/{fileId}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Successful HEAD request, Terminating an upload\", () => {\r",
+              "    pm.response.to.have.status(204);\r",
+              "    pm.expect(pm.response.text()).to.be.empty;\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles/{{fileId}}",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles",
+            "{{fileId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH3 no upload resource",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"UnSuccessful PATCH request, upload resource not found\", () => {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/offset+octet-stream",
+            "type": "text"
+          },
+          {
+            "key": "Upload-Offset",
+            "value": "{{offset}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "Test upload chunk3.\r\n"
+        },
+        "url": {
+          "raw": "http://{{host}}:{{port}}/uploadfiles/{{fileId}}",
+          "protocol": "http",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "uploadfiles",
+            "{{fileId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": ""
+    },
+    {
+      "key": "port",
+      "value": ""
+    },
+    {
+      "key": "fileId",
+      "value": ""
+    },
+    {
+      "key": "offset",
+      "value": ""
+    }
+  ]
+}
