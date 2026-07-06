@@ -2,7 +2,6 @@
  * Server Startup Module
  * Starts the Express server on the specified port
  * Handles graceful shutdown on SIGTERM and SIGINT signals
- * Author: Liyu Wu
  * Update: 2026-05-05
  */
 
